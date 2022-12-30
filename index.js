@@ -36,17 +36,18 @@ async function run() {
             res.send(result)
 
         })
-        // app.post('/', async (req, res) => {
-        //     try {
-        //         const data = await req.body;
-        //         console.log(data)
-        //         const result = await lists.insertOne(data);
-        //         res.json('ListItem added!', result)
-        //     } catch (err) {
-        //         console.error(err.message);
-        //         res.status(500).json('Server Error');
-        //     }
-        // });
+        app.get('/lists/:email', async (req, res) => {
+            // const query = { email: 'raswakaraziam@gmail' };
+            // console.log(query)
+            // const tasks = await lists.find(query);
+            // console.log(tasks)
+            // res.send(tasks);
+            const emailAdress = req.params.email
+            const quary = { "email": emailAdress }
+            const cursor = lists.find(quary)
+            const user = await cursor.toArray()
+            res.send(user)
+        })
     } finally {
 
     }
