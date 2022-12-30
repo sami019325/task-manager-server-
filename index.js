@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 5000;
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 // require('dotenv').config();
 
 // middleware
@@ -26,9 +26,7 @@ async function run() {
     try {
         const database = client.db("taskBox");
         const lists = database.collection("lists");
-        // app.post('/', async (req, res) => {
 
-        // })
         app.post('/insert', async (req, res) => {
             const dataCollection = req.body
             console.log(dataCollection)
@@ -36,18 +34,69 @@ async function run() {
             res.send(result)
 
         })
+
+
+
+        app.delete('/delete/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const result = await lists.deleteOne(query)
+            res.send(result)
+        })
+
+        // update and set the value false
+        app.get('/lists/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    "IsActive": false
+                },
+            };
+
+            const result = await lists.updateOne(query, updateDoc, options)
+            res.send(result)
+            console.log(query, result)
+        })
+        // update and set the value true
+        app.get('/listsneg/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    "IsActive": true
+                },
+            };
+
+            const result = await lists.updateOne(query, updateDoc, options)
+            res.send(result)
+            console.log(query, result)
+        })
         app.get('/lists/:email', async (req, res) => {
-            // const query = { email: 'raswakaraziam@gmail' };
-            // console.log(query)
-            // const tasks = await lists.find(query);
-            // console.log(tasks)
-            // res.send(tasks);
+
             const emailAdress = req.params.email
             const quary = { "email": emailAdress }
             const cursor = lists.find(quary)
             const user = await cursor.toArray()
             res.send(user)
         })
+        // app.get('/lists/:id', async (req, res) => {
+        //     const id = req.params.id
+        //     const filter = { _id: ObjectId(id) };
+        //     // const options = { upsert: true };
+        //     // create a document that sets the plot of the movie
+        //     // const updateDoc = {
+        //     //     IsActive: false
+        //     // };
+        //     const result = await lists.findOne(filter);
+        //     res.send(result);
+        // })
+
+
     } finally {
 
     }
